@@ -1,0 +1,19 @@
+# Dados gerados pela coleta (reproduzíveis rodando `megasena`)
+data/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.venv/
+venv/
+.pytest_cache/
+
+# Editores / SO
+.vscode/
+.idea/
+Thumbs.db
+desktop.ini
+.DS_Store

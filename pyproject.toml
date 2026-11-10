@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "megasena-coletor"
+dynamic = ["version"]
+description = "Coleta os resultados oficiais da Mega-Sena na API da CAIXA e grava em SQLite."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Fabio Sampaio", email = "fassampaio@gmail.com" }]
+dependencies = ["requests>=2.31"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Natural Language :: Portuguese (Brazilian)",
+]
+
+[project.urls]
+Repository = "https://github.com/fassampaio/megasena"
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+
+[project.scripts]
+megasena = "megasena.cli:main"
+
+[tool.setuptools.dynamic]
+version = { attr = "megasena.__version__" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
