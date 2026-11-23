@@ -1,6 +1,7 @@
 """Exporta estatísticas do banco da Mega-Sena em JSON para o dashboard.
 
-Uso: python scripts/exportar_estatisticas.py [--db data/megasena.db] [--saida data/dashboard]
+Uso: python scripts/exportar_estatisticas.py [--db BASE] [--saida data/dashboard]
+(sem --db, usa a base ativa escolhida com `megasena --usar-base`)
 
 Gera dois arquivos no formato {rows, meta}:
   - concursos.json: uma linha por concurso (dezenas, soma, pares, prêmios, arrecadação)
@@ -77,9 +78,19 @@ def dezenas(linhas: list[dict], recentes: int = 100) -> list[dict]:
 
 def main() -> None:
     p = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    p.add_argument("--db", type=Path, default=Path("data/megasena.db"))
+    p.add_argument("--db", type=Path, default=None,
+                   help="arquivo SQLite (padrão: a base ativa do megasena, ou data/megasena.db)")
     p.add_argument("--saida", type=Path, default=Path("data/dashboard"))
     a = p.parse_args()
+    if a.db is None:
+        try:
+            from megasena.bases import base_ativa
+            a.db = base_ativa()
+        except ImportError:
+            a.db = Path("data/megasena.db")
+    if not a.db.exists():
+        raise SystemExit(f"base não encontrada: {a.db}")
+    print(f"base: {a.db}")
     conn = sqlite3.connect(a.db)
     linhas = concursos(conn)
     codigo = Path(__file__).read_text(encoding="utf-8")

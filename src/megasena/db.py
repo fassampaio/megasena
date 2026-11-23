@@ -118,6 +118,16 @@ def gravar_concurso(conn: sqlite3.Connection, c: Concurso, arquivo_raw: str, sha
             (c.numero, "; ".join(c.avisos) or None, agora))
 
 
+def zerar(conn: sqlite3.Connection) -> int:
+    """Apaga todos os concursos, dezenas, rateios e o log de coleta. Devolve quantos concursos havia."""
+    total = conn.execute("SELECT COUNT(*) FROM concursos").fetchone()[0]
+    with conn:
+        for tabela in ("dezenas", "rateio", "coleta_log", "concursos"):
+            conn.execute(f"DELETE FROM {tabela}")
+    conn.execute("VACUUM")
+    return total
+
+
 def registrar_erro(conn: sqlite3.Connection, numero: int, erro: str) -> None:
     with conn:
         conn.execute(

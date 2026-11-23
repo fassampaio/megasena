@@ -39,14 +39,33 @@ comum no Python da Microsoft Store), use `python -m megasena` com os mesmos argu
 
 | Opção | Padrão | Descrição |
 |---|---|---|
-| `--db` | `data/megasena.db` | arquivo SQLite |
+| `--db` | base ativa | base só para esta execução: nome (`teste` → `data/teste.db`) ou caminho |
 | `--raw` | `data/raw/megasena` | pasta dos JSON originais |
 | `--pausa` | `0.5` | segundos entre requisições |
 | `--timeout` | `30` | timeout HTTP (s) |
 | `--tentativas` | `5` | tentativas por requisição (espera exponencial) |
 | `--insecure` | — | desativa a verificação SSL (só se o certificado da CAIXA estiver quebrado) |
 
-Códigos de saída: `0` sucesso, `1` houve falhas/problemas, `2` API inacessível, `130` interrompido.
+Códigos de saída: `0` sucesso, `1` houve falhas/problemas ou operação cancelada, `2` API inacessível, `130` interrompido.
+
+### Escolher e zerar a base de dados
+
+Você pode manter várias bases (por exemplo, uma de testes) e escolher qual o sistema usa:
+
+```bash
+megasena --listar-bases        # lista as bases em data/ e marca a ativa com *
+megasena --usar-base teste     # passa a usar data/teste.db em todos os comandos
+megasena --usar-base megasena  # volta para a base padrão
+megasena --zerar               # apaga todos os concursos da base ativa (pede confirmação)
+megasena --db teste --zerar    # zera outra base sem trocar a ativa
+```
+
+- A escolha fica gravada em `data/config.json` e vale também para `scripts/exportar_estatisticas.py`.
+- `--usar-base` aceita um nome (vira `data/NOME.db`) ou um caminho para qualquer arquivo `.db`.
+- `--zerar` pede que você digite `zerar` para confirmar. Use `--sim` para pular a pergunta
+  (necessário em scripts, sem terminal). A operação não pode ser desfeita.
+- `--zerar` apaga só o banco: os JSON originais em `data/raw/` são mantidos, e a próxima
+  coleta reconstrói a base a partir deles sem baixar de novo.
 
 ## Estrutura dos dados
 
