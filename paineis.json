@@ -1,0 +1,12 @@
+{
+  "paineis": [
+    {
+      "nome": "Estatísticas da Mega-Sena",
+      "url": "https://claude.ai/artifact/FDHPe2WWs8zYJtho51BG78",
+      "datasets": {
+        "concursos": "data/dashboard/concursos.json",
+        "dezenas": "data/dashboard/dezenas.json"
+      }
+    }
+  ]
+}

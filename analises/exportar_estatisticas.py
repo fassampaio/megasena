@@ -1,6 +1,6 @@
 """Exporta estatísticas do banco da Mega-Sena em JSON para o dashboard.
 
-Uso: python scripts/exportar_estatisticas.py [--db BASE] [--saida data/dashboard]
+Uso: python analises/exportar_estatisticas.py [--db BASE] [--saida data/dashboard]
 (sem --db, usa a base ativa escolhida com `megasena --usar-base`)
 
 Gera dois arquivos no formato {rows, meta}:
@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sqlite3
 from pathlib import Path
 
@@ -82,6 +83,8 @@ def main() -> None:
                    help="arquivo SQLite (padrão: a base ativa do megasena, ou data/megasena.db)")
     p.add_argument("--saida", type=Path, default=Path("data/dashboard"))
     a = p.parse_args()
+    if a.db is None and os.environ.get("MEGASENA_DB"):
+        a.db = Path(os.environ["MEGASENA_DB"])
     if a.db is None:
         try:
             from megasena.bases import base_ativa

@@ -60,12 +60,54 @@ megasena --zerar               # apaga todos os concursos da base ativa (pede co
 megasena --db teste --zerar    # zera outra base sem trocar a ativa
 ```
 
-- A escolha fica gravada em `data/config.json` e vale também para `scripts/exportar_estatisticas.py`.
+- A escolha fica gravada em `data/config.json` e vale também para o `atualizar.py` e as análises em `analises/`.
 - `--usar-base` aceita um nome (vira `data/NOME.db`) ou um caminho para qualquer arquivo `.db`.
 - `--zerar` pede que você digite `zerar` para confirmar. Use `--sim` para pular a pergunta
   (necessário em scripts, sem terminal). A operação não pode ser desfeita.
 - `--zerar` apaga só o banco: os JSON originais em `data/raw/` são mantidos, e a próxima
   coleta reconstrói a base a partir deles sem baixar de novo.
+
+## Atualizar tudo de uma vez
+
+Um único comando atualiza a base, refaz todas as análises e diz quais painéis precisam ser
+republicados:
+
+```bash
+python atualizar.py                # coleta + validação + análises + checagem dos painéis
+python atualizar.py --sem-coleta   # só refaz as análises com a base atual
+python atualizar.py --listar       # mostra análises e painéis registrados
+python atualizar.py --publicado    # marca os painéis pendentes como já enviados
+```
+
+Etapas, nesta ordem:
+
+1. **coleta** — `megasena` (baixa só o que falta). API fora do ar vira aviso, não erro.
+2. **validação** — `megasena --validar`.
+3. **análises** — cada `.py` da pasta `analises/`, em ordem alfabética. Uma análise com erro não
+   impede as outras.
+4. **painéis** — compara os arquivos listados em `paineis.json` com o último envio
+   (`data/paineis_publicados.json`) e lista os que mudaram.
+
+O resumo da execução fica em `data/atualizacao.json`. Código de saída `1` se alguma etapa falhou.
+
+### Criar uma análise nova
+
+Salve o script em `analises/` e pronto: ele entra no próximo `atualizar.py`. Use um prefixo
+numérico (`10_`, `20_`…) se a ordem importar; arquivos que começam com `_` são ignorados
+(bom para módulos auxiliares). O script roda com a raiz do projeto como pasta atual e recebe:
+
+| Variável | Conteúdo |
+|---|---|
+| `MEGASENA_DB` | caminho da base ativa |
+| `MEGASENA_DADOS` | pasta `data/` |
+| `MEGASENA_SAIDA` | pasta sugerida para resultados (`data/analises/`) |
+
+### Painéis publicados
+
+Se a análise alimenta um painel publicado no Claude, registre-o em `paineis.json`
+(`url` do painel e, para cada dataset, o arquivo gerado). A publicação em si é feita pelo
+Claude no chat de controle: peça "atualize tudo" e ele roda o `atualizar.py`, envia os arquivos
+pendentes ao painel e roda `--publicado`.
 
 ## Estrutura dos dados
 

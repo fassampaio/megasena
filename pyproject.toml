@@ -24,6 +24,7 @@ dev = ["pytest>=8"]
 
 [project.scripts]
 megasena = "megasena.cli:main"
+megasena-atualizar = "megasena.atualizar:main"
 
 [tool.setuptools.dynamic]
 version = { attr = "megasena.__version__" }
